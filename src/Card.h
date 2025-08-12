@@ -6,10 +6,7 @@
 class Card
 {
 private:
-
     SDL_Texture * texture;
-
-
 
 public:
     Card();
@@ -21,16 +18,8 @@ public:
     {
         0.f,
         0.f,
-        100.f,  //78 - 21
-        100.f,  //87 - 12
-    };
-    
-    SDL_FRect cardRect =
-    {
-        21.f,
-        12.f,
-        57.f,
-        75.f,
+        58.f,  //78 - 21
+        76.f,  //87 - 12
     };
 
     SDL_FRect handPosition;
@@ -41,9 +30,10 @@ public:
     //Hover Animation
     float popAmount = 0.0f;
 
+    int cardValue;
 
-    float cardLeft = cardRect.x  - textureRect.x;
-    float cardRight = textureRect.w - (cardRect.x +cardRect.w);
+    float cardLeft = textureRect.x;
+    float cardRight = textureRect.w - (textureRect.x);
 
 };
 

@@ -16,6 +16,7 @@ set(SOURCES
   src/Game.cpp
   src/Card.cpp
   src/Hand.cpp
+  src/Deck.cpp
 )
 
 file(GLOB TMXLITE_SOURCES
