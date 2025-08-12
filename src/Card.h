@@ -33,6 +33,15 @@ public:
         75.f,
     };
 
+    SDL_FRect handPosition;
+
+    //where the card is interactable
+    SDL_FRect bounds;
+
+    //Hover Animation
+    float popAmount = 0.0f;
+
+
     float cardLeft = cardRect.x  - textureRect.x;
     float cardRight = textureRect.w - (cardRect.x +cardRect.w);
 

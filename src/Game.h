@@ -10,7 +10,8 @@ private:
     void render();
     void processEvents();
     void loadTextures();
-    void handleEvent(const SDL_Event &e);
+    void handleWindowEvent(const SDL_Event &e);
+    void handleMouseEvent(const SDL_Event &e);
 
     //Initialize window variables
     SDL_Window *window = NULL;

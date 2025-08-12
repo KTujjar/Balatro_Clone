@@ -30,6 +30,30 @@ void Hand::Draw(SDL_Renderer *r, int drawSize)
     }
 }
 
+void Hand::checkHover(int mouseX, int mouseY) {
+    hoveredCardIndex = -1;
+    SDL_FPoint mousePoint = { static_cast<float>(mouseX), static_cast<float>(mouseY) };
+    for (size_t i = 0; i < hand.size(); i++) {
+        if (SDL_PointInRectFloat(&mousePoint, &hand[i]->bounds)) {
+            hoveredCardIndex = i;
+            //SDL_Log("%d", hoveredCardIndex);
+            break;
+        }
+    }
+}
+
+void Hand::updateHoverAnimation(double delta) {
+    for (size_t i = 0; i < hand.size(); i++) {
+        if ((int)i == hoveredCardIndex) {
+            hand[i]->popAmount += 2.0f * delta; // grow
+            if (hand[i]->popAmount > maxPop) hand[i]->popAmount = maxPop;
+        } else {
+            hand[i]->popAmount -= 2.0f * delta; // shrink back
+            if (hand[i]->popAmount < 0) hand[i]->popAmount = 0;
+        }
+    }
+}
+
 void Hand::RenderHandArea(SDL_Renderer *r)
 {
     SDL_FRect position = {120, 230, 400, 100};
@@ -50,20 +74,52 @@ void Hand::RenderHandCards(SDL_Renderer *r)
 {
     float cardWidth = 400.f/maxHandSize;
     float overlapWidth = hand[0]->cardRect.w / cardWidth;
+    float calculatedPosition;
     for(int i = 0; i < hand.size(); i++)
     {
-        float calculatedPosition;
-        if(i == 0)
+
+        calculatedPosition = (120.0f - (hand[i]->cardLeft)) + ((cardWidth - overlapWidth) * (i));
+
+        hand[i]->handPosition = 
         {
-            calculatedPosition = (120.0f - (hand[i]->cardLeft)); //- (cardWidth - overlapWidth);
+            calculatedPosition, 
+            220.0f, 
+            100.0f, 
+            100.0f,
+        };
+
+        //Makes last card interactable throughout full width
+        if(i == (hand.size() - 1))
+        {
+            hand[i]->bounds = 
+            {
+                calculatedPosition + hand[i]->cardLeft,
+                220.0f,
+                hand[i]->cardRect.w,
+                100.0f,
+            };
         }
         else
         {
-            calculatedPosition = (120.0f - (hand[i]->cardLeft)) + ((cardWidth - overlapWidth) * (i));
+            hand[i]->bounds = 
+            {
+                calculatedPosition + hand[i]->cardLeft,
+                220.0f,
+                cardWidth - overlapWidth,
+                100.0f,
+            };
         }
 
+        float scale = 1.0f + hand[i]->popAmount; // e.g., popAmount = 0.2 means +20% size
+        SDL_FRect drawPos = hand[i]->handPosition;
+        drawPos.w *= scale;
+        drawPos.h *= scale;
+        drawPos.x -= (drawPos.w - hand[i]->handPosition.w) / 2;
+        drawPos.y -= (drawPos.h - hand[i]->handPosition.h) / 2;
+        hand[i]->Draw(r, drawPos);
+
         //SDL_Log("calculatedPosition: %f", calculatedPosition);
-        hand[i]->Draw(r, {calculatedPosition, 220.0f, 100.0f, 100.0f});
+        //hand[i]->Draw(r, hand[i]->handPosition);
 
         handCount+=1;
     }

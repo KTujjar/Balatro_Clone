@@ -61,6 +61,7 @@ void Game::run()
 //Handles updating whats drawin on screen
 void Game::update(double delta)
 {
+    hand.updateHoverAnimation(delta);
 }
 
 //Handles drawing to screen
@@ -103,12 +104,35 @@ void Game::processEvents()
             window = NULL;
             break;
         }
-        handleEvent(e);
+
+
+        handleMouseEvent(e);
+        handleWindowEvent(e);
     }
 }
 
+void Game::handleMouseEvent(const SDL_Event &e)
+{
+    if(e.type == SDL_EVENT_MOUSE_MOTION) {
+            int mx = e.motion.x;
+            int my = e.motion.y;
+
+            flags = SDL_GetWindowFlags(window);
+
+            if(flags & SDL_WINDOW_FULLSCREEN)
+            {
+                mx = e.motion.x / 3;
+                my = e.motion.y / 3;
+            }
+            
+            //SDL_Log("mx: %d, my: %d", mx, my);
+            
+            hand.checkHover(mx, my); // store which card is hovered
+        }
+}
+
 //Handles Resizing Window
-void Game::handleEvent(const SDL_Event &e)
+void Game::handleWindowEvent(const SDL_Event &e)
 {
     if (e.type == SDL_EVENT_KEY_DOWN) {
         if (e.key.scancode == SDL_SCANCODE_F11) 
