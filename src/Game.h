@@ -7,7 +7,9 @@ class Game
 {
 private:
     void update(double delta);
+    void renderWindow();
     void render();
+    void updateFPS(double dt);
     void processEvents();
     void loadTextures();
     void handleWindowEvent(const SDL_Event &e);
@@ -19,6 +21,8 @@ private:
     SDL_Surface* screenSurface = NULL;
     SDL_Event e;   
     const SDL_PixelFormatDetails* details = NULL;
+
+    Deck deck;
 
     Hand hand;
 

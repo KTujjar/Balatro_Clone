@@ -2,50 +2,24 @@
 
 Game::Game()
 {
-
-    //Render Window
-    if(!SDL_Init(SDL_INIT_VIDEO))
-    {
-        SDL_Log("SDL could not initialize! SDL_Error: %s\n", SDL_GetError());
-    }
-    else
-    {
-        //Create window
-        if(!SDL_CreateWindowAndRenderer("Balatro Clone", Global::windowWidth, Global::windowHeight, SDL_EVENT_WINDOW_SHOWN, &window, &renderer))
-        {
-            SDL_Log( "Window could not be created! SDL_Error: %s\n", SDL_GetError() );
-        }
-        else
-        {
-            //Get window surface
-            screenSurface = SDL_GetWindowSurface( window );
-
-            //Get pixel format of surface
-            details = SDL_GetPixelFormatDetails( screenSurface->format );
-
-            //Fill the surface white
-            SDL_FillSurfaceRect( screenSurface, NULL, SDL_MapRGB( details, NULL, 0xFF, 0xFF, 0xFF ));
-            
-            //Update the surface
-            SDL_UpdateWindowSurface( window );
-
-            SDL_SetWindowFullscreen(window, SDL_WINDOW_BORDERLESS);
-        }
-    }
+    renderWindow();
 }
 
 //Loads Assets once before main game loop
 void Game::loadTextures()
 {
-    hand.Init(renderer);
+    deck.Init(renderer, "../assets/Cards/Cards.png");
+    hand.Init(renderer, &deck);
 }
 
 //Game Loop
 void Game::run()
 {
+    loadTextures();
+    SDL_ShowWindow(window);
+
     Uint64 last = SDL_GetPerformanceCounter();
 
-    loadTextures();
     while(window != NULL)
     {
         Uint64 now = SDL_GetPerformanceCounter();
@@ -55,27 +29,31 @@ void Game::run()
         processEvents();
         update(dt);
         render();
+        updateFPS(dt);
     }
+}
+
+void Game::updateFPS(double dt)
+{
+    double fps = 1.0 / dt;
+
+    //SDL_Log("FPS: %.2f", fps);
 }
 
 //Handles updating whats drawin on screen
 void Game::update(double delta)
 {
-    hand.updateHoverAnimation(delta);
+    hand.Update(delta);
 }
 
 //Handles drawing to screen
 void Game::render()
 {
-    SDL_SetRenderDrawColor(renderer, 39, 73, 56, 255); // Clear to black
     SDL_RenderClear(renderer);
-    SDL_SetRenderVSync(renderer, 1);
     SDL_SetRenderLogicalPresentation(renderer, Global::windowWidth, Global::windowHeight, SDL_LOGICAL_PRESENTATION_INTEGER_SCALE); //scales renderer with window
 
-
+    deck.Render(renderer);
     hand.Render(renderer);
-    //Card card(renderer, "../assets/Cards/Ace_Heart.png");
-    //Card card(renderer, "../assets/Cards/Ace_Heart.png");
 
 
     SDL_RenderPresent(renderer);
@@ -113,22 +91,58 @@ void Game::processEvents()
 
 void Game::handleMouseEvent(const SDL_Event &e)
 {
+    int mx = e.motion.x;
+    int my = e.motion.y;
+
+    if(flags & SDL_WINDOW_FULLSCREEN)
+    {
+        mx = e.motion.x / 3;
+        my = e.motion.y / 3;
+    }
+
     if(e.type == SDL_EVENT_MOUSE_MOTION) {
-            int mx = e.motion.x;
-            int my = e.motion.y;
 
-            flags = SDL_GetWindowFlags(window);
-
-            if(flags & SDL_WINDOW_FULLSCREEN)
-            {
-                mx = e.motion.x / 3;
-                my = e.motion.y / 3;
-            }
-            
-            //SDL_Log("mx: %d, my: %d", mx, my);
-            
-            hand.checkHover(mx, my); // store which card is hovered
+        flags = SDL_GetWindowFlags(window);
+        
+        hand.checkHover(mx, my); // store which card is hovered
+    }
+    
+    if(e.type == SDL_EVENT_MOUSE_BUTTON_DOWN)
+    {
+        if(e.button.button == SDL_BUTTON_LEFT)
+        {
+            hand.checkSelected(mx,my);
         }
+    }
+}
+
+void Game::renderWindow()
+{
+    //Render Window
+    if(!SDL_Init(SDL_INIT_VIDEO))
+    {
+        SDL_Log("SDL could not initialize! SDL_Error: %s\n", SDL_GetError());
+        return;
+    }
+    
+        
+    window = SDL_CreateWindow("Balatro Clone", Global::windowWidth, Global::windowHeight, SDL_EVENT_WINDOW_SHOWN);
+
+    renderer = SDL_CreateRenderer(window, NULL);
+
+    if (!window || !renderer) {
+        SDL_Log("Window or Renderer creation failed: %s", SDL_GetError());
+        return;
+    }
+
+    if (!SDL_SetRenderVSync(renderer, 1)) {
+        SDL_Log("Failed to enable VSync: %s", SDL_GetError());
+    }
+    
+    SDL_SetRenderDrawColor(renderer, 39, 73, 56, 255); // Clear to black
+    SDL_RenderClear(renderer);
+    SDL_RenderPresent(renderer);
+        
 }
 
 //Handles Resizing Window

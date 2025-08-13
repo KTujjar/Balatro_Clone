@@ -4,13 +4,22 @@ Card::Card()
 {
 }
 
-bool Card::Load(SDL_Renderer *r, const char *filename)
+bool Card::Init(SDL_Renderer *r, SDL_Texture *spriteSheet, int x, int y)
 {
-    texture = IMG_LoadTexture(r, filename);
+    texture = spriteSheet;
     if(texture == nullptr)
     {
         return false;
     }
+    
+    textureRect =
+    {
+        (float)(x * 58),
+        (float)(y * 76),
+        58.0f,
+        76.0f,
+    };
+
     SDL_SetTextureScaleMode(texture, SDL_SCALEMODE_NEAREST);
     return true;
 }
@@ -19,7 +28,8 @@ bool Card::Draw(SDL_Renderer *r, SDL_FRect position)
 {
     if(texture != nullptr)
     {
-        if (!SDL_RenderTexture(r, texture, &textureRect, &position)) {
+        cardRect = position;
+        if (!SDL_RenderTexture(r, texture, &textureRect, &cardRect)) {
             SDL_Log("RenderTextureRotated failed: %s", SDL_GetError());
             return false;
         }

@@ -12,15 +12,11 @@ public:
     Card();
     ~Card();
     bool Draw(SDL_Renderer *r, SDL_FRect position);
-    bool Load(SDL_Renderer *r, const char *filename);
+    bool Init(SDL_Renderer *r, SDL_Texture *spriteSheet, int x, int y);
 
-    SDL_FRect textureRect =
-    {
-        0.f,
-        0.f,
-        58.f,  //78 - 21
-        76.f,  //87 - 12
-    };
+    SDL_FRect textureRect;
+
+    SDL_FRect cardRect;
 
     SDL_FRect handPosition;
 
@@ -29,11 +25,11 @@ public:
 
     //Hover Animation
     float popAmount = 0.0f;
+    float selectSpeed = 0.0f;
+
+    bool selected = false;  
 
     int cardValue;
-
-    float cardLeft = textureRect.x;
-    float cardRight = textureRect.w - (textureRect.x);
 
 };
 

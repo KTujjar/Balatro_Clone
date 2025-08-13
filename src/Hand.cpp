@@ -10,8 +10,9 @@ Hand::Hand()
 }
 
 //Initializes the hand
-void Hand::Init(SDL_Renderer* r)
+void Hand::Init(SDL_Renderer* r, Deck *d)
 {
+    deck = d;
     if (hand.size() < maxHandSize) {
         Draw(r, maxHandSize - hand.size());
     }
@@ -22,29 +23,45 @@ void Hand::Draw(SDL_Renderer *r, int drawSize)
 {
     for(int i = 0; i < drawSize; i++)
     {
-        hand.push_back(std::make_unique<Card>());
-        
-        if(!hand.back()->Load(r, "../assets/Cards/Cards.png"))
-        {
-            SDL_Log("Could not load card. Error: %s", SDL_GetError());
-        }
-
+        srand(getpid());
+        int randomNum = rand() % deck->cards.size();
+        hand.push_back(std::move(deck->cards[randomNum]));
+        deck->Discard(randomNum);
     }
 }
 
 //Checks if card is hovered
-void Hand::checkHover(int mouseX, int mouseY) {
+bool Hand::checkHover(int mouseX, int mouseY) {
     hoveredCardIndex = -1;
     SDL_FPoint mousePoint = { static_cast<float>(mouseX), static_cast<float>(mouseY) };
     for (size_t i = 0; i < hand.size(); i++) {
         if (SDL_PointInRectFloat(&mousePoint, &hand[i]->bounds)) {
             hoveredCardIndex = i;
-            break;
+            return true;
+        }
+    }
+    return false;
+}
+
+//Selects hovered card
+void Hand::checkSelected(int mouseX, int mouseY)
+{
+    if(checkHover(mouseX, mouseY))
+    {   
+        if(hand[hoveredCardIndex]->selected)
+        {
+            hand[hoveredCardIndex]->selected = false;
+            selectedAmount -=1;
+        }
+        else if(selectedAmount < 5)
+        {
+            hand[hoveredCardIndex]->selected = true;
+            selectedAmount +=1;
         }
     }
 }
 
-//Creates the popout hover animation
+//Handles update of hover animation
 void Hand::updateHoverAnimation(double delta) {
     for (size_t i = 0; i < hand.size(); i++) {
         if ((int)i == hoveredCardIndex) {
@@ -55,6 +72,26 @@ void Hand::updateHoverAnimation(double delta) {
             if (hand[i]->popAmount < 0) hand[i]->popAmount = 0;
         }
     }
+}
+
+//Handles update of select animation
+void Hand::updateSelectAnimation(double delta) {
+    for (size_t i = 0; i < hand.size(); i++) {
+        if (hand[(int)i]->selected) {
+            hand[i]->selectSpeed += 3.0f * delta; // grow
+            if (hand[i]->selectSpeed > maxSelectPosition) hand[i]->selectSpeed = maxSelectPosition;
+        } else {
+            hand[i]->selectSpeed -= 3.0f * delta; // shrink back
+            if (hand[i]->selectSpeed < maxSelectPosition) hand[i]->selectSpeed = maxSelectPosition;
+        }
+    }
+}
+
+//Handles all hand updates
+void Hand::Update(double delta)
+{
+    updateHoverAnimation(delta);
+    updateSelectAnimation(delta);
 }
 
 //Renders the rectangle for the hand
@@ -82,8 +119,14 @@ void Hand::RenderHandCards(SDL_Renderer *r)
     float calculatedPosition;
     for(int i = 0; i < hand.size(); i++)
     {
+        if (!hand[i]) 
+        {
+            SDL_Log("Card is not valid");
+            continue;
+        }
 
-        calculatedPosition = (120.0f - (hand[i]->cardLeft)) + ((cardWidth - overlapWidth) * (i));
+
+        calculatedPosition = (120.0f) + ((cardWidth - overlapWidth) * (i));
 
         hand[i]->handPosition = 
         {
@@ -98,7 +141,7 @@ void Hand::RenderHandCards(SDL_Renderer *r)
         {
             hand[i]->bounds = 
             {
-                calculatedPosition + hand[i]->cardLeft,
+                calculatedPosition,
                 220.0f,
                 hand[i]->textureRect.w,
                 100.0f,
@@ -108,7 +151,7 @@ void Hand::RenderHandCards(SDL_Renderer *r)
         {
             hand[i]->bounds = 
             {
-                calculatedPosition + hand[i]->cardLeft,
+                calculatedPosition,
                 220.0f,
                 cardWidth - overlapWidth,
                 100.0f,
@@ -121,6 +164,14 @@ void Hand::RenderHandCards(SDL_Renderer *r)
         drawPos.h *= scale;
         drawPos.x -= (drawPos.w - hand[i]->handPosition.w) / 2;
         drawPos.y -= (drawPos.h - hand[i]->handPosition.h);
+
+
+        if(hand[i]->selected)
+        {
+            hand[i]->bounds.y -= hand[i]->selectSpeed;
+            drawPos.y -= (hand[i]->selectSpeed);
+        }
+
         hand[i]->Draw(r, drawPos);
 
         handCount+=1;
