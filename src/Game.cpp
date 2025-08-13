@@ -10,6 +10,7 @@ void Game::loadTextures()
 {
     deck.Init(renderer, "../assets/Cards/Cards.png");
     hand.Init(renderer, &deck);
+    playButton.Init(renderer, "Play", 32.0f, {100, 100, 100, 50}, {30, 144, 255, 255}, {255, 255, 255, 255});
 }
 
 //Game Loop
@@ -52,8 +53,10 @@ void Game::render()
     SDL_RenderClear(renderer);
     SDL_SetRenderLogicalPresentation(renderer, Global::windowWidth, Global::windowHeight, SDL_LOGICAL_PRESENTATION_INTEGER_SCALE); //scales renderer with window
 
+    playButton.Render(renderer);
     deck.Render(renderer);
     hand.Render(renderer);
+    //playButton.Render(renderer);
 
 
     SDL_RenderPresent(renderer);
@@ -67,8 +70,7 @@ Game::~Game()
 
 
 
-
-
+    TTF_Quit();
     SDL_Quit();
 }
 
@@ -123,6 +125,11 @@ void Game::renderWindow()
     {
         SDL_Log("SDL could not initialize! SDL_Error: %s\n", SDL_GetError());
         return;
+    }
+
+    if(!TTF_Init())
+    {
+        SDL_Log("TTF not Initializing");
     }
     
         

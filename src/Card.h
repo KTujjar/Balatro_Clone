@@ -29,7 +29,8 @@ public:
 
     bool selected = false;  
 
-    int cardValue;
+    int cardRank;
+    int cardSuit;
 
 };
 

@@ -2,6 +2,7 @@
 #include "Global.h"
 #include "Card.h"
 #include "Hand.h"
+#include "Button.h"
 
 class Game
 {
@@ -23,7 +24,8 @@ private:
     const SDL_PixelFormatDetails* details = NULL;
 
     Deck deck;
-
+    Button playButton;
+    Button discardButton;
     Hand hand;
 
     Uint32 flags;
