@@ -17,15 +17,26 @@ public:
     TTF_Font *font;
     SDL_FRect textRect;
     float fontSize;
-    SDL_Texture *textTexture;
+    SDL_Texture *textTexture = nullptr;
+
+    //Texture for button if asset
+    SDL_Texture *texture = nullptr;
+    SDL_FRect textureRect;
+
 
     //button position and size
     SDL_FRect buttonRect;
     SDL_Color buttonColor;
 
-    void Init(SDL_Renderer *r, const char *text, float fSize, SDL_FRect rect, SDL_Color Color, SDL_Color tColor);
+    //Initializes Button From: renderer | filename(nullptr if no texture) | text for button(nullptr for no text) | font size of text | source rect(emtpyrect if no texture) | destination rect | color of button(empty rect if texture) | color of text(empty rect if no text) 
+    void Init(SDL_Renderer *r, const char *filename, const char *text, float fSize, SDL_FRect srcRect, SDL_FRect rect, SDL_Color Color, SDL_Color tColor);
+    
+    
     void createButton(SDL_Renderer *r);
+    
+    
     bool Render(SDL_Renderer *r);
+    
     Button();
     ~Button();
 };

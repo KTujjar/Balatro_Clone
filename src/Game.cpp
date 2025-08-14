@@ -10,7 +10,8 @@ void Game::loadTextures()
 {
     deck.Init(renderer, "../assets/Cards/Cards.png");
     hand.Init(renderer, &deck);
-    playButton.Init(renderer, "Play", 32.0f, {100, 100, 100, 50}, {30, 144, 255, 255}, {255, 255, 255, 255});
+    playButton.Init(renderer, "../assets/Buttons/PlayHand.png", "Play Hand", 18.0f, {0, 0, 100, 50}, {10, 225, 100, 50}, {30, 144, 255, 255}, {255, 255, 255, 255});
+    discardButton.Init(renderer, "../assets/Buttons/Discard.png", "Discard", 18.0f, {0, 0, 100, 50}, {10, 285, 100, 50}, {30, 144, 255, 255}, {255, 255, 255, 255});
 }
 
 //Game Loop
@@ -54,6 +55,7 @@ void Game::render()
     SDL_SetRenderLogicalPresentation(renderer, Global::windowWidth, Global::windowHeight, SDL_LOGICAL_PRESENTATION_INTEGER_SCALE); //scales renderer with window
 
     playButton.Render(renderer);
+    discardButton.Render(renderer);
     deck.Render(renderer);
     hand.Render(renderer);
     //playButton.Render(renderer);
