@@ -42,6 +42,7 @@ set(SOURCES
     src/Hand.cpp
     src/Deck.cpp
     src/Button.cpp
+    src/Score.cpp
 )
 
 file(GLOB TMXLITE_SOURCES

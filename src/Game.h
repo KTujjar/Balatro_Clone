@@ -3,6 +3,7 @@
 #include "Card.h"
 #include "Hand.h"
 #include "Button.h"
+#include "Score.h"
 
 
 class Game
@@ -28,6 +29,7 @@ private:
     Button playButton;
     Button discardButton;
     Hand hand;
+    Score score;
 
     Uint32 flags;
 

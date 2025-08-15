@@ -11,11 +11,12 @@ Button::~Button()
     TTF_CloseFont(font);
 }
 
-void Button::Init(SDL_Renderer *r, const char *filename, const char *text, float fSize, SDL_FRect srcRect, SDL_FRect rect, SDL_Color Color, SDL_Color tColor)
+void Button::Init(SDL_Renderer *r, const char *filename, bool i, const char *text, float fSize, SDL_FRect srcRect, SDL_FRect rect, SDL_Color Color, SDL_Color tColor)
 {
     buttonText = text;
     buttonRect = rect;
     fontSize = fSize;
+    interactable = i;
     
     if(filename != NULL)
     {
@@ -23,8 +24,19 @@ void Button::Init(SDL_Renderer *r, const char *filename, const char *text, float
         SDL_SetTextureScaleMode(texture, SDL_SCALEMODE_NEAREST);
     }
 
-    textureRect = srcRect;
+    textureRect = srcRect; 
+    tempRect = textureRect;
 
+    //buttons will only have 2 frames for animation
+    if(interactable == true)
+    {
+        pressedTextureRect = {
+            srcRect.x + srcRect.w,
+            srcRect.y,
+            srcRect.w,
+            srcRect.h 
+        };
+    }
 
     buttonColor = {
         Color.r,
@@ -32,7 +44,6 @@ void Button::Init(SDL_Renderer *r, const char *filename, const char *text, float
         Color.b,
         Color.a
     };
-
 
     if(buttonText != nullptr)
     {
@@ -68,19 +79,67 @@ void Button::Init(SDL_Renderer *r, const char *filename, const char *text, float
         textH = SDL_GetNumberProperty(textTextureProperties, SDL_PROP_TEXTURE_HEIGHT_NUMBER, 0);
 
         textRect = {((buttonRect.x + (buttonRect.w/2)) - textW/2), ((buttonRect.y + (buttonRect.h/2)) - textH/2), textW, textH};
+        tempTextRect = textRect;
     }    
+}
 
-    // textTexture = SDL_CreateTextureFromSurface(r, textSurface);
-    // SDL_SetTextureScaleMode(textTexture, SDL_SCALEMODE_NEAREST);
-    // SDL_DestroySurface(textSurface);
+//Checks if button is hovered
+bool Button::checkHover(int mouseX, int mouseY) {
+    if(interactable)
+    {
+        SDL_FPoint mousePoint = { static_cast<float>(mouseX), static_cast<float>(mouseY) };
 
-    // SDL_PropertiesID textTextureProperties;
-    // textTextureProperties = SDL_GetTextureProperties(textTexture);
+        if (SDL_PointInRectFloat(&mousePoint, &buttonRect)) { 
+            return true;
+        }
+        tempTextRect = textRect;
+        tempRect = textureRect;
+        return false;
+    } 
 
-    // textW = SDL_GetNumberProperty(textTextureProperties, SDL_PROP_TEXTURE_WIDTH_NUMBER, 0);
-    // textH = SDL_GetNumberProperty(textTextureProperties, SDL_PROP_TEXTURE_HEIGHT_NUMBER, 0);
+    SDL_Log("Button is not interactable. Cannot call checkHover().");   
+    return false;
+}
 
-    // textRect = {((buttonRect.x + (buttonRect.w/2)) - textW/2), ((buttonRect.y + (buttonRect.h/2)) - textH/2), textW, textH};
+//Checks if button is pressed
+void Button::checkPressed(int mouseX, int mouseY, int textMoveAmount)
+{   
+
+    textMovedRect = 
+    {
+        textRect.x + textMoveAmount,
+        textRect.y + textMoveAmount,
+        textRect.w,
+        textRect.h
+    };
+
+    if(interactable)
+    {
+        if(checkHover(mouseX, mouseY))
+        {   
+            tempRect = pressedTextureRect;
+            tempTextRect = textMovedRect;
+        }
+    }
+    else{
+        SDL_Log("Button is not interactable. Cannot call checkSelected().");
+    }
+}
+
+//Checks if button is released
+void Button::checkReleased(int mouseX, int mouseY)
+{   
+    if(interactable)
+    {
+        if(checkHover(mouseX, mouseY))
+        {   
+            tempRect = textureRect;
+            tempTextRect = textRect;
+        }
+    }
+    else{
+        SDL_Log("Button is not interactable. Cannot call checkReleased().");
+    }
 }
 
 bool Button::Render(SDL_Renderer *r)
@@ -100,7 +159,7 @@ bool Button::Render(SDL_Renderer *r)
     }
     else
     {
-        if(!SDL_RenderTexture(r, texture, &textureRect, &buttonRect));
+        if(!SDL_RenderTexture(r, texture, &tempRect, &buttonRect));
     }
     if(textTexture != nullptr)
     {
@@ -109,7 +168,7 @@ bool Button::Render(SDL_Renderer *r)
             SDL_Log("failed to load text Color");
             return false;
         }
-        if(!SDL_RenderTexture(r, textTexture, nullptr, &textRect))
+        if(!SDL_RenderTexture(r, textTexture, nullptr, &tempTextRect))
         {
             SDL_Log("Failed to load Text");
             return false;

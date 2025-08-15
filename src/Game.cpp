@@ -10,8 +10,9 @@ void Game::loadTextures()
 {
     deck.Init(renderer, "../assets/Cards/Cards.png");
     hand.Init(renderer, &deck);
-    playButton.Init(renderer, "../assets/Buttons/PlayHand.png", "Play Hand", 18.0f, {0, 0, 100, 50}, {10, 225, 100, 50}, {30, 144, 255, 255}, {255, 255, 255, 255});
-    discardButton.Init(renderer, "../assets/Buttons/Discard.png", "Discard", 18.0f, {0, 0, 100, 50}, {10, 285, 100, 50}, {30, 144, 255, 255}, {255, 255, 255, 255});
+    playButton.Init(renderer, "../assets/Buttons/PlayHandAnimSheet.png", true, "Play Hand", 18.0f, {0, 0, 100, 50}, {10, 230, 100, 50}, {30, 144, 255, 255}, {255, 255, 255, 255});
+    discardButton.Init(renderer, "../assets/Buttons/DiscardAnimSheet.png", true, "Discard", 18.0f, {0, 0, 100, 50}, {10, 285, 100, 50}, {30, 144, 255, 255}, {255, 255, 255, 255});
+    score.Init(renderer);
 }
 
 //Game Loop
@@ -58,9 +59,9 @@ void Game::render()
     discardButton.Render(renderer);
     deck.Render(renderer);
     hand.Render(renderer);
-    //playButton.Render(renderer);
+    score.Render(renderer);
 
-
+    SDL_SetRenderDrawColor(renderer, 39, 73, 56, 255);
     SDL_RenderPresent(renderer);
 }
 
@@ -109,6 +110,8 @@ void Game::handleMouseEvent(const SDL_Event &e)
         flags = SDL_GetWindowFlags(window);
         
         hand.checkHover(mx, my); // store which card is hovered
+        playButton.checkHover(mx,my);
+        discardButton.checkHover(mx,my);
     }
     
     if(e.type == SDL_EVENT_MOUSE_BUTTON_DOWN)
@@ -116,6 +119,17 @@ void Game::handleMouseEvent(const SDL_Event &e)
         if(e.button.button == SDL_BUTTON_LEFT)
         {
             hand.checkSelected(mx,my);
+            playButton.checkPressed(mx,my,2);
+            discardButton.checkPressed(mx,my,2);
+        }
+    }
+
+    if(e.type == SDL_EVENT_MOUSE_BUTTON_UP)
+    {
+        if(e.button.button == SDL_BUTTON_LEFT)
+        {
+            playButton.checkReleased(mx, my);
+            discardButton.checkReleased(mx,my);
         }
     }
 }
@@ -148,7 +162,6 @@ void Game::renderWindow()
         SDL_Log("Failed to enable VSync: %s", SDL_GetError());
     }
     
-    SDL_SetRenderDrawColor(renderer, 39, 73, 56, 255); // Clear to black
     SDL_RenderClear(renderer);
     SDL_RenderPresent(renderer);
         

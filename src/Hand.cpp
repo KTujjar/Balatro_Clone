@@ -99,7 +99,7 @@ void Hand::RenderHandArea(SDL_Renderer *r)
 {
     SDL_FRect position = {120, 230, 400, 100};
 
-    if(!SDL_SetRenderDrawColor(r, 33, 64, 49, 255))
+    if(!SDL_SetRenderDrawColor(r, 34, 64, 49, 255))
     {
         SDL_Log("Failed to color hand background");
     }
