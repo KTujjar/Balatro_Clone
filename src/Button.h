@@ -42,7 +42,7 @@ public:
     
     bool checkHover(int mouseX, int mouseY);
     void checkPressed(int mouseX, int mouseY, int textMoveAmount);
-    void checkReleased(int mouseX, int mouseY);
+    bool checkReleased(int mouseX, int mouseY);
     
     
     bool Render(SDL_Renderer *r);

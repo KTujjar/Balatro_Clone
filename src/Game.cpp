@@ -36,6 +36,7 @@ void Game::run()
     }
 }
 
+
 void Game::updateFPS(double dt)
 {
     double fps = 1.0 / dt;
@@ -46,7 +47,10 @@ void Game::updateFPS(double dt)
 //Handles updating whats drawin on screen
 void Game::update(double delta)
 {
-    hand.Update(delta);
+    hand.Update(renderer, delta);
+    score.updateScoreText(renderer, 32.0f, {255,255,255,255});
+    score.score += hand.getScore();
+    hand.handScore = 0;
 }
 
 //Handles drawing to screen
@@ -94,6 +98,7 @@ void Game::processEvents()
     }
 }
 
+
 void Game::handleMouseEvent(const SDL_Event &e)
 {
     int mx = e.motion.x;
@@ -128,11 +133,19 @@ void Game::handleMouseEvent(const SDL_Event &e)
     {
         if(e.button.button == SDL_BUTTON_LEFT)
         {
-            playButton.checkReleased(mx, my);
-            discardButton.checkReleased(mx,my);
+            if(playButton.checkReleased(mx, my))
+            {
+                hand.playHand = true;
+            }
+
+            if(discardButton.checkReleased(mx,my))
+            {
+                hand.discard = true;
+            }
         }
     }
 }
+
 
 void Game::renderWindow()
 {

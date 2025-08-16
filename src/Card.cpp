@@ -20,7 +20,7 @@ bool Card::Init(SDL_Renderer *r, SDL_Texture *spriteSheet, int x, int y)
         76.0f,
     };
 
-    cardRank = x;
+    cardRank = x + 1;
     cardSuit = y;
 
     SDL_SetTextureScaleMode(texture, SDL_SCALEMODE_NEAREST);
@@ -33,7 +33,7 @@ bool Card::Draw(SDL_Renderer *r, SDL_FRect position)
     {
         cardRect = position;
         if (!SDL_RenderTexture(r, texture, &textureRect, &cardRect)) {
-            SDL_Log("RenderTextureRotated failed: %s", SDL_GetError());
+            SDL_Log("Could not draw card: %s  Rank: %d", SDL_GetError(), cardRank);
             return false;
         }
     }
@@ -48,5 +48,4 @@ bool Card::Draw(SDL_Renderer *r, SDL_FRect position)
 
 Card::~Card()
 {
-    SDL_DestroyTexture(texture);
 }

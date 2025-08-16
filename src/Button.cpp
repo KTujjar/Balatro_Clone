@@ -127,7 +127,7 @@ void Button::checkPressed(int mouseX, int mouseY, int textMoveAmount)
 }
 
 //Checks if button is released
-void Button::checkReleased(int mouseX, int mouseY)
+bool Button::checkReleased(int mouseX, int mouseY)
 {   
     if(interactable)
     {
@@ -135,11 +135,14 @@ void Button::checkReleased(int mouseX, int mouseY)
         {   
             tempRect = textureRect;
             tempTextRect = textRect;
+            return true;
         }
     }
     else{
         SDL_Log("Button is not interactable. Cannot call checkReleased().");
+        return false;
     }
+    return false;
 }
 
 bool Button::Render(SDL_Renderer *r)

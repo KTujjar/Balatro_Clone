@@ -56,5 +56,12 @@ void Deck::Render(SDL_Renderer *r)
 
 Deck::~Deck()
 {
-
+    if (spriteSheet) {
+        SDL_DestroyTexture(spriteSheet);
+        spriteSheet = nullptr;
+    }
+    if (cardBack) {
+        SDL_DestroyTexture(cardBack);
+        cardBack = nullptr;
+    }
 }

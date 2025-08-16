@@ -1,6 +1,5 @@
 #include "Hand.h"
 
-int Hand::handCount = 0;
 
 Hand::Hand()
 {
@@ -14,12 +13,12 @@ void Hand::Init(SDL_Renderer* r, Deck *d)
 {
     deck = d;
     if (hand.size() < maxHandSize) {
-        Draw(r, maxHandSize - hand.size());
+        drawCards(r, maxHandSize - hand.size());
     }
 }
 
 //Draws cards based on amount of cards in hand
-void Hand::Draw(SDL_Renderer *r, int drawSize)
+void Hand::drawCards(SDL_Renderer *r, int drawSize)
 {
     for(int i = 0; i < drawSize; i++)
     {
@@ -28,6 +27,47 @@ void Hand::Draw(SDL_Renderer *r, int drawSize)
         hand.push_back(std::move(deck->cards[randomNum]));
         deck->Discard(randomNum);
     }
+}
+
+
+void Hand::print()
+{
+    for(int i = 0; i < hand.size(); i++)
+    {
+        SDL_Log("Index: %d Rank: %d", i, hand[i]->cardRank);
+    }
+}
+
+
+void Hand::discardCards(SDL_Renderer *r)
+{
+
+    //Removes selected cards from hand
+    hand.erase(
+        std::remove_if(hand.begin(), hand.end(), [&](std::unique_ptr<Card> &card) {
+            if (card->selected) {
+                selectedAmount -= 1;
+                return true; // remove this card
+            }
+            return false;
+        }),
+        hand.end()
+    );
+
+    //SDL_Log("Hand Size: %d", hand.size());
+}
+
+
+void Hand::scoreCards()
+{
+
+    handScore = 10;
+}
+
+
+int Hand::getScore()
+{
+    return handScore;
 }
 
 //Checks if card is hovered
@@ -56,9 +96,11 @@ void Hand::checkSelected(int mouseX, int mouseY)
         else if(selectedAmount < 5)
         {
             hand[hoveredCardIndex]->selected = true;
+            //SDL_Log("%d", hand[hoveredCardIndex]->cardRank);
             selectedAmount +=1;
         }
     }
+    //SDL_Log("\nselected_amount in check: %d\n", selectedAmount);
 }
 
 //Handles update of hover animation
@@ -88,8 +130,37 @@ void Hand::updateSelectAnimation(double delta) {
 }
 
 //Handles all hand updates
-void Hand::Update(double delta)
+void Hand::Update(SDL_Renderer *r ,double delta)
 {
+    if(discard)
+    {
+        discardCards(r);
+        if(deck->cards.size() < (maxHandSize - hand.size()))
+        {
+            drawCards(r, deck->cards.size());
+        }
+        else
+        {
+            drawCards(r, maxHandSize - hand.size());
+        }
+        discard = false;
+    }
+
+    if(playHand)
+    {
+        scoreCards();
+        discardCards(r);
+        if(deck->cards.size() < (maxHandSize - hand.size()))
+        {
+            drawCards(r, deck->cards.size());
+        }
+        else
+        {
+            drawCards(r, maxHandSize - hand.size());
+        }
+        playHand = false;
+    }
+
     updateHoverAnimation(delta);
     updateSelectAnimation(delta);
 }
@@ -173,8 +244,6 @@ void Hand::RenderHandCards(SDL_Renderer *r)
         }
 
         hand[i]->Draw(r, drawPos);
-
-        handCount+=1;
     }
 
 }
@@ -183,8 +252,10 @@ void Hand::RenderHandCards(SDL_Renderer *r)
 void Hand::Render(SDL_Renderer *r)
 {
    RenderHandArea(r);
+
    RenderHandCards(r);
 }
+
 
 Hand::~Hand()
 {
