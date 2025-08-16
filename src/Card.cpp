@@ -21,7 +21,7 @@ bool Card::Init(SDL_Renderer *r, SDL_Texture *spriteSheet, int x, int y)
     };
 
     cardRank = x + 1;
-    cardSuit = y;
+    cardSuit = y + 1;
 
     SDL_SetTextureScaleMode(texture, SDL_SCALEMODE_NEAREST);
     return true;

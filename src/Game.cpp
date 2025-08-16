@@ -36,7 +36,7 @@ void Game::run()
     }
 }
 
-
+//prints game fps
 void Game::updateFPS(double dt)
 {
     double fps = 1.0 / dt;

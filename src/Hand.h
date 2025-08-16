@@ -6,6 +6,7 @@
 #include <cstdlib>
 #include "Button.h"
 #include <algorithm>
+#include <map>
 
 class Hand
 {
@@ -23,6 +24,7 @@ public:
     int handScore = 0;
 
     std::vector<std::unique_ptr<Card>> hand;
+    std::vector<std::unique_ptr<Card>> selected;
     Hand();
     ~Hand();
     void print();
@@ -37,7 +39,8 @@ public:
     void Init(SDL_Renderer *r, Deck *d);
     void RenderHandArea(SDL_Renderer *r);
     void RenderHandCards(SDL_Renderer *r);
-    void discardCards(SDL_Renderer *r);
-    void scoreCards();
+    void discardCards();
+    void getScoreCards();
+    void calculateScore();
 
 };

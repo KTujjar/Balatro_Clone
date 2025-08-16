@@ -29,7 +29,7 @@ void Hand::drawCards(SDL_Renderer *r, int drawSize)
     }
 }
 
-
+//prints current hand
 void Hand::print()
 {
     for(int i = 0; i < hand.size(); i++)
@@ -38,8 +38,8 @@ void Hand::print()
     }
 }
 
-
-void Hand::discardCards(SDL_Renderer *r)
+//Discards selected cards
+void Hand::discardCards()
 {
 
     //Removes selected cards from hand
@@ -57,14 +57,89 @@ void Hand::discardCards(SDL_Renderer *r)
     //SDL_Log("Hand Size: %d", hand.size());
 }
 
-
-void Hand::scoreCards()
+//Creates the score for the selected cards
+void Hand::getScoreCards()
 {
-
-    handScore = 10;
+    selected.clear();
+    auto it = hand.begin();
+    while (it != hand.end())
+    {
+        if ((*it)->selected)
+        {
+            selected.push_back(std::move(*it));
+            it = hand.erase(it);
+            selectedAmount -=1;
+        }
+        else
+        {
+            ++it;
+        }
+    }
 }
 
+//Scoring Logic
+void Hand::calculateScore()
+{
+    std::map<int, int> rankCount;
+    std::map<int, int> suitCount;
+    std::vector<int> ranks;
 
+    for (auto &card : selected) {
+        rankCount[card->cardRank]++;
+        suitCount[card->cardSuit]++;
+        ranks.push_back(card->cardRank);
+    }
+
+    // Sort ranks for straight checking
+    std::sort(ranks.begin(), ranks.end());
+    
+    // Handle Ace high by adding 14 if Ace is present
+    if (std::find(ranks.begin(), ranks.end(), 1) != ranks.end()) {
+        ranks.push_back(14);
+    }
+
+    // ---- Now check combinations ----
+    bool flush = false;
+    for (auto &s : suitCount) {
+        if (s.second >= 5) flush = true;
+    }
+
+    bool straight = false;
+    int consecutive = 1;
+    for (size_t i = 1; i < ranks.size(); i++) {
+        if (ranks[i] == ranks[i-1] + 1) {
+            consecutive++;
+            if (consecutive >= 5) straight = true;
+        } else if (ranks[i] != ranks[i-1]) {
+            consecutive = 1;
+        }
+    }
+
+    // Check multiples
+    int pairs = 0, three = 0, four = 0;
+    for (auto &r : rankCount) {
+        if (r.second == 2) pairs++;
+        if (r.second == 3) three++;
+        if (r.second == 4) four++;
+    }
+
+    // ---- Decide Hand Strength ----
+    if (straight && flush) handScore = 9;
+    if (four)  handScore = 8;
+    if (three && pairs) handScore = 7;
+    if (flush) handScore = 6;
+    if (straight) handScore = 5;
+    if (three) handScore = 4;
+    if (pairs >= 2) handScore = 3;
+    if (pairs == 1) handScore = 2;
+    
+    if(handScore == 0)
+    {
+        handScore = 1;
+    }
+}
+
+//Gets the hand score
 int Hand::getScore()
 {
     return handScore;
@@ -134,7 +209,7 @@ void Hand::Update(SDL_Renderer *r ,double delta)
 {
     if(discard)
     {
-        discardCards(r);
+        discardCards();
         if(deck->cards.size() < (maxHandSize - hand.size()))
         {
             drawCards(r, deck->cards.size());
@@ -148,8 +223,8 @@ void Hand::Update(SDL_Renderer *r ,double delta)
 
     if(playHand)
     {
-        scoreCards();
-        discardCards(r);
+        getScoreCards();
+        calculateScore();
         if(deck->cards.size() < (maxHandSize - hand.size()))
         {
             drawCards(r, deck->cards.size());
