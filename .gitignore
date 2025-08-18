@@ -1,15 +1,15 @@
-*.exe
-*.ilk
-*.zip
-*.exp
-*.obj
-*.dll
-*.pdb
-*.nativecodeanalysis.xml
-*.lib
-*.ttf
+# *.exe
+# *.ilk
+# *.zip
+# *.exp
+# *.obj
+# *.dll
+# *.pdb
+# *.nativecodeanalysis.xml
+# *.lib
+# *.ttf
 build
-.vs
-c_cpp_properties.json
-settings.json
-.clangd
+# .vs
+# c_cpp_properties.json
+# settings.json
+# .clangd
