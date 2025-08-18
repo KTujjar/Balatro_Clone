@@ -11,4 +11,5 @@ Players can select, play, and discard cards, with real-time scoring and
 animations powered by SDL2.  
 
 ## 🎥 Demo
-![Gameplay Screenshot](./assets/Screenshots/screenshot.png)
+![Gameplay Screenshot](./assets/Screenshots/screenshot1.png)
+![Gameplay Screenshot](./assets/Screenshots/screenshot2.png)
