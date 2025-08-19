@@ -162,7 +162,7 @@ void Game::renderWindow()
     }
     
         
-    window = SDL_CreateWindow("Balatro Clone", Global::windowWidth, Global::windowHeight, SDL_EVENT_WINDOW_SHOWN);
+    window = SDL_CreateWindow("CardGame2D", Global::windowWidth, Global::windowHeight, SDL_EVENT_WINDOW_SHOWN);
 
     renderer = SDL_CreateRenderer(window, NULL);
 

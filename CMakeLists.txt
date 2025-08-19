@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(Balatro_Clone)
+project(CardGame2D)
 set(CMAKE_CXX_STANDARD 17)
 
 # Output directories
@@ -54,17 +54,17 @@ file(GLOB TMXLITE_SOURCES
 file(COPY assets DESTINATION ${CMAKE_BINARY_DIR})
 
 # Create executable
-add_executable(Balatro_Clone WIN32 ${SOURCES})
-target_sources(Balatro_Clone PRIVATE ${TMXLITE_SOURCES})
+add_executable(CardGame2D WIN32 ${SOURCES})
+target_sources(CardGame2D PRIVATE ${TMXLITE_SOURCES})
 
 # Include directories
-target_include_directories(Balatro_Clone PRIVATE
+target_include_directories(CardGame2D PRIVATE
     external/tmxlite/include
     ${FREETYPE_INCLUDE_DIRS}
 )
 
 # Link libraries
-target_link_libraries(Balatro_Clone PRIVATE
+target_link_libraries(CardGame2D PRIVATE
     Freetype::Freetype
     SDL3::SDL3
     SDL3_image::SDL3_image
