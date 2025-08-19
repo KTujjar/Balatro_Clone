@@ -3,7 +3,7 @@
 A 2D card game build with C++ and SDL3.
 
 ![C++](https://img.shields.io/badge/language-C++-blue)
-![SDL2](https://img.shields.io/badge/framework-SDL2-green)
+![SDL2](https://img.shields.io/badge/framework-SDL3-green)
 ![Status](https://img.shields.io/badge/status-active-brightgreen)
 
 CardGame2D is a top-down 2D card game that supports poker-style scoring.
